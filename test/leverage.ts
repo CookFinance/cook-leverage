@@ -8,8 +8,10 @@ import { ProxyRegistryInterface } from "../typechain/ProxyRegistryInterface";
 import {
   FlashSwapCompoundHandler,
   FlashSwapCompoundHandlerFactory,
-  CompoundTaker,
-  CompoundTakerFactory,
+  LeveragedBorrowCompound,
+  LeveragedBorrowCompoundFactory,
+  // CompoundTaker,
+  // CompoundTakerFactory,
 } from "../typechain";
 
 
@@ -30,8 +32,8 @@ const overrides = {
 describe("Leverage", function () {
   let proxyAddr: string;
   let web3Proxy: DsProxy;
-  let compoundTakerFactory: CompoundTakerFactory;
-  let compoundTaker: CompoundTaker;
+  let compoundTakerFactory: LeveragedBorrowCompoundFactory;
+  let compoundTaker: LeveragedBorrowCompound;
   let flashSwapCompoundHandler: FlashSwapCompoundHandler;
   let flashSwapCompoundHandlerFactory: FlashSwapCompoundHandlerFactory;
   let destTokenContract: Contract;
@@ -52,8 +54,8 @@ describe("Leverage", function () {
       "FlashSwapCompoundHandler"
     )) as FlashSwapCompoundHandlerFactory;
     compoundTakerFactory = (await ethers.getContractFactory(
-      "CompoundTaker"
-    )) as CompoundTakerFactory;
+      "LeveragedBorrowCompound"
+    )) as LeveragedBorrowCompoundFactory;
     flashSwapCompoundHandler = await flashSwapCompoundHandlerFactory.deploy();
     await flashSwapCompoundHandler.deployed();
     compoundTaker = await compoundTakerFactory.deploy();

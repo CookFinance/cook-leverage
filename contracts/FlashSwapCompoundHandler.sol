@@ -43,11 +43,11 @@ contract FlashSwapCompoundHandler is IUniswapV2Callee {
         // Send loaned asset to DsProxy
         IERC20(uniswapBorrowToken).safeTransfer(dsProxy, IERC20(uniswapBorrowToken).balanceOf(address(this)));
         // get Compound proxy address
-        address compoundProxyAddress = proxyRegistry.getAddr("COMP_PROXY");
+        // address compoundProxyAddress = proxyRegistry.getAddr("COMP_PROXY");
         // Execute the DsProxy call to open loan on Compound
         bytes memory openLoanLogicData = abi.encodeWithSignature(
-            "openLoan(address, address,address,uint256)",
-            compoundProxyAddress,
+            "openLoan(address,address,uint256)",
+            // compoundProxyAddress,
             cCollateralToken,
             cBorrowToken,
             uniswapBorrowTokenAmount);
@@ -75,9 +75,10 @@ contract FlashSwapCompoundHandler is IUniswapV2Callee {
     }
 
     // Context: DSProxy
-    function openLoan(address compoundProxy, address cCollateralToken, address cBorrowToken, uint uniswapBorrowTokenAmount) public {
+    function openLoan(// address compoundProxy,
+                      address cCollateralToken, address cBorrowToken, uint uniswapBorrowTokenAmount) public {
         console.log(address(this));
-        CompoundBorrowRepay compoundborrowrepay = CompoundBorrowRepay(compoundProxy);
+        // address compoundborrowrepay = CompoundBorrowRepay(compoundProxy);
         address collateralToken = getUnderlyingAddr(cCollateralToken);
         address borrowToken = getUnderlyingAddr(cBorrowToken);
         // address collateralToken = CTokenInterface(cCollateralToken).underlying();
@@ -85,14 +86,14 @@ contract FlashSwapCompoundHandler is IUniswapV2Callee {
         // uint collateralTokenAmount = IERC20(collateralToken).balanceOf(address(this));
         uint collateralTokenAmount = getProxyBalance(address(this), collateralToken);
         uint underlyingDecimal = 6;
-        // depositCompound(collateralToken, cCollateralToken, collateralTokenAmount);
+        depositCompound(collateralToken, cCollateralToken, collateralTokenAmount);
         // draw debt
-        // borrowCompound(cBorrowToken, uniswapBorrowTokenAmount);
-        compoundborrowrepay.borrowErc20(
-            cCollateralToken,
-            underlyingDecimal,
-            uniswapBorrowTokenAmount
-        );
+        borrowCompound(cBorrowToken, uniswapBorrowTokenAmount);
+        // compoundborrowrepay.borrowErc20(
+        //     cCollateralToken,
+        //     underlyingDecimal,
+        //     uniswapBorrowTokenAmount
+        // );
         // Send back to repay uniswap flash swap. msg.sender here is FlashSwapCompoundHandler.
         IERC20(borrowToken).safeTransfer(msg.sender, IERC20(borrowToken).balanceOf(address(this)));
     }
